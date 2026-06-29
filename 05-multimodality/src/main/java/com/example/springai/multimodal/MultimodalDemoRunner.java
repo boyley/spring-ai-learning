@@ -58,8 +58,7 @@ public class MultimodalDemoRunner implements CommandLineRunner {
 
         // 演示用的网络图片地址（一张经典的 PNG 透明度演示图，公开可访问）。
         // 用"图片 URL"方式可以避免把二进制图片打进项目，演示最简单。
-        String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/"
-                + "PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png";
+        String imageUrl = "https://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960";
 
         System.out.println("【发送】文字：这张图片里有什么？请用中文描述");
         System.out.println("【发送】图片：" + imageUrl);

@@ -5,35 +5,46 @@ spring:
     web-application-type: none
   application:
     name: 05-multimodality
-  config:
-    import:
-      - "optional:file:../config/spring-ai-common.yml"
-      - "optional:file:./config/spring-ai-common.yml"
 
   # ===========================================================================
-  #  ★ 本模块专属：用本地配置"覆盖"共享配置里的 chat 能力 ★
+  #  ★★★ 本模块为什么【不】import 共享配置 config/spring-ai-common.yml？★★★
   # ---------------------------------------------------------------------------
-  #  为什么要覆盖？
-  #    - 共享配置（config/spring-ai-common.yml）把 chat（对话）能力指向了 DeepSeek。
-  #    - 但 DeepSeek 目前【不支持视觉/图片理解】，无法做多模态。
-  #    - 本模块要"看图说话"，必须把 chat 能力切换到支持视觉的模型。
-  #    - 这里改用【阿里通义千问 VL】视觉模型（百炼专属网关，OpenAI 兼容接口）。
-  #
-  #  覆盖是怎么生效的？
-  #    - spring.config.import 导入的共享文件优先级较低；
-  #    - 本文件（模块自己的 application.yml）里直接写的属性优先级更高，会覆盖同名属性。
-  #    - 所以下面这段会把 chat 的 base-url / api-key / model 改成阿里通义千问的设置。
-  #
-  #  ★ 使用前：设置环境变量（不要把 Key 写进文件提交到 git，会泄露！）
-  #        export DASHSCOPE_API_KEY=sk-ws-你的真实Key
+  #  踩坑记录（重要！）：
+  #    - 共享配置 spring-ai-common.yml 把 chat 指向 DeepSeek（deepseek-chat，纯文本，
+  #      不支持图片/视觉）。本模块要"看图说话"，必须换成视觉模型。
+  #    - 一开始尝试"import 共享配置，然后在本文件里覆盖 base-url/model"——【失败】。
+  #      原因是 Spring Boot 的 spring.config.import 优先级规则：
+  #        ★ 被 import 进来的文件，优先级【高于】写 import 的这个文件 ★
+  #        （官方原文：Values from the imported file will take precedence over
+  #         the file that triggered the import.）
+  #      所以无论本文件怎么写 model: qwen-vl-plus，都会被 common.yml 的
+  #      deepseek-chat 反向覆盖，请求实际发去了 DeepSeek，报错：
+  #        HTTP 400 unknown variant `image_url`, expected `text`
+  #      （即 DeepSeek 文本模型拒绝图片输入）。
+  #    - 正确做法：本模块【不 import 共享配置】，自带一份完整的视觉模型配置，
+  #      这样没有任何文件能再覆盖它。
   # ===========================================================================
   ai:
     openai:
+      # 阿里百炼【公共】OpenAI 兼容地址（可自由指定模型，含视觉模型 qwen-vl-*）。
+      # ★ 坑：Spring AI 会自动在 base-url 后拼接 /v1/chat/completions，
+      #   所以 base-url 这里【只写到 /compatible-mode，不要带 /v1】，
+      #   否则会变成 .../compatible-mode/v1/v1/chat/completions 双 v1 → HTTP 404。
+      #   最终真实请求地址 = base-url + /v1/chat/completions
+      #                    = https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions ✓
+      # （专属网关 llm-xxx.maas... 只服务你部署的那一个模型，多为文本模型，会拒绝图片，
+      #   所以多模态用这个公共地址。）
+      base-url: https://dashscope.aliyuncs.com/compatible-mode
+      # 从环境变量读取 Key，避免明文写入源码：export DASHSCOPE_API_KEY=sk-xxx
+      api-key: ${DASHSCOPE_API_KEY:请设置环境变量DASHSCOPE_API_KEY}
       chat:
-        # 阿里百炼专属网关的 OpenAI 兼容地址（注意：已含 /compatible-mode/v1 完整路径）
-        base-url: https://llm-18qwefy46kq78xoy.cn-beijing.maas.aliyuncs.com/compatible-mode/v1
-        # 从环境变量读取 Key，避免明文写入源码
-        api-key: ${DASHSCOPE_API_KEY:请设置环境变量DASHSCOPE_API_KEY}
         options:
           # 通义千问视觉模型：qwen-vl-plus（便宜够用），要更强可换 qwen-vl-max
           model: qwen-vl-plus
+
+# 日志配置：让控制台少打印 INFO 噪音，聚焦演示输出（原本由共享配置提供，这里自带一份）
+logging:
+  level:
+    root: WARN
+    com.example.springai: INFO
+    org.springframework.ai: INFO
