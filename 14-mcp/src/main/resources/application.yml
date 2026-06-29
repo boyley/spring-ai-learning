@@ -1,4 +1,8 @@
 spring:
+  # ★ 覆盖共享配置里的 none：MCP Server 是真正的 Web 应用，必须以 servlet(Tomcat) 方式运行。
+  #   本模块依赖里有 spring-boot-starter-web，这里声明 servlet 让它启动 Web 服务器。
+  main:
+    web-application-type: servlet
   application:
     name: 14-mcp
   config:

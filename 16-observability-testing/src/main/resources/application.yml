@@ -1,4 +1,8 @@
 spring:
+  # ★ 覆盖共享配置里的 none：本模块要以 Web 应用方式运行，
+  #   这样 /actuator/metrics 等端点才能通过 HTTP 访问。应用会启动 Tomcat 并保持运行（按 Ctrl+C 停止）。
+  main:
+    web-application-type: servlet
   application:
     name: 16-observability-testing
   config:

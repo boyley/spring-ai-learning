@@ -1,4 +1,8 @@
 spring:
+  # 声明为非 Web 应用：本模块是命令行演示(CommandLineRunner 跑完即退出)。
+  # OpenAI starter 传递引入了 webflux，不声明会被误判为 reactive Web 应用而启动失败。
+  main:
+    web-application-type: none
   application:
     name: 13-audio-model
   config:

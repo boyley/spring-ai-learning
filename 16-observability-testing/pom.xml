@@ -32,6 +32,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
+        <!-- Web 服务器(Tomcat)：本模块需要以 Web 应用方式运行，才能通过浏览器/HTTP
+             访问 /actuator/metrics 查看指标。引入它后应用会启动一个 Web 服务器并保持运行。 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
