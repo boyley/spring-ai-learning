@@ -126,6 +126,90 @@ public class StructuredOutputDemoRunner implements CommandLineRunner {
      *
      * record 是 Java 16+ 的"不可变数据载体"，会自动生成构造器、getter(同名方法)、
      * equals/hashCode/toString。定义为 static 嵌套类型，保证 Jackson 能正常反序列化。
+     *
+     * ========================================================================
+     * 【结构化输出的完整闭环：字段名是怎么"对上"的？模型怎么知道字段含义？】
+     * ========================================================================
+     *
+     * 一句话：模型理解字段含义主要靠【字段名本身的英文语义】；而字段名能在
+     *        "生成 Schema"和"反序列化"两头都对得上，靠的是 record 的【组件名反射】。
+     *
+     * ── 阶段A：发请求前（生成 JSON Schema，由 BeanOutputConverter 完成）──────────
+     *
+     *   1) 通过反射读取本 record 的【组件名】(getRecordComponents() -> actor、movies)
+     *      及其类型(String、List<String>)，自动生成 JSON Schema：
+     *
+     *          {
+     *            "properties": {
+     *              "actor":  { "type": "string" },                          ← key 来自组件名
+     *              "movies": { "type": "array", "items": { "type": "string" } }
+     *            }
+     *          }
+     *
+     *   2) ⚠ 默认 Schema 里【没有任何一句话】解释"actor 是演员名"。
+     *      模型之所以能填对，是因为 actor / movies 这些英文单词本身就有语义，
+     *      大模型一看就懂。 ==> 所以给字段起【有意义的英文名】本身就是最好的"说明"，
+     *      若命名成 a、b，模型就很可能填错。
+     *
+     *   3) 想让含义更明确(字段名不自解释、或要约束取值)，加 Jackson 注解，
+     *      它会被写进 Schema 的 "description" 一起发给模型，例如：
+     *
+     *          public record ActorFilms(
+     *              @JsonPropertyDescription("演员的中文全名，例如：周星驰")
+     *              String actor,
+     *              @JsonPropertyDescription("该演员的代表作电影名称列表，最多5部")
+     *              List<String> movies) {}
+     *
+     *      加注解后生成的 Schema 就多了 description（模型能看到这两句解释）：
+     *
+     *          {
+     *            "properties": {
+     *              "actor": {
+     *                "type": "string",
+     *                "description": "演员的中文全名，例如：周星驰"        ← 模型能看到!
+     *              },
+     *              "movies": {
+     *                "type": "array",
+     *                "items": { "type": "string" },
+     *                "description": "该演员的代表作电影名称列表，最多5部"
+     *              }
+     *            }
+     *          }
+     *
+     *      常用 Jackson 注解一览：
+     *      ┌──────────────────────────────────┬──────────────────────────────────┐
+     *      │ 注解                              │ 作用                             │
+     *      ├──────────────────────────────────┼──────────────────────────────────┤
+     *      │ @JsonPropertyDescription("...")  │ 给单个字段加说明(最常用)         │
+     *      │ @JsonClassDescription("...")     │ 给整个类加说明                   │
+     *      │ @JsonProperty("real_name")       │ 改 JSON 里的 key 名(与字段名解耦)│
+     *      │ @JsonProperty(required = true)   │ 标记必填，会进 Schema 的 required│
+     *      └──────────────────────────────────┴──────────────────────────────────┘
+     *
+     *   4) 这段 Schema 被【拼接到 user 提示词后面】一起发给模型（见 demo4 打印）。
+     *
+     * ── 阶段B：收响应后（反序列化，由 Jackson 完成）──────────────────────────────
+     *
+     *   模型返回:  {"actor":"周星驰","movies":["..","..",..]}
+     *   Jackson 按 JSON 的 key 去匹配本 record 里【同名的组件】，再调用
+     *   record 的【规范构造器】 new ActorFilms("周星驰", [..]) 得到强类型对象。
+     *
+     *   ==> 这就是为什么 JSON 的 key 必须和 record 组件名一致：
+     *       阶段A 用组件名生成 key，阶段B 用 key 匹配组件名，两头闭合。
+     *
+     * ── 闭环图 ──────────────────────────────────────────────────────────────────
+     *
+     *   ActorFilms record
+     *      │ (反射组件名 + @JsonPropertyDescription)
+     *      ▼
+     *   JSON Schema(字段名 + 类型 + 可选 description)
+     *      │ 拼进提示词
+     *      ▼
+     *   大模型 ◄── 靠【字段名语义】+【description】理解每个字段含义
+     *      │ 返回 {"actor":..,"movies":..}
+     *      ▼
+     *   Jackson 按 key 匹配 record 同名组件 -> 调规范构造器 -> ActorFilms 对象
+     * ========================================================================
      */
     public record ActorFilms(String actor, List<String> movies) {
     }
