@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: 05-multimodality
+  config:
+    import:
+      - "optional:file:../config/spring-ai-common.yml"
+      - "optional:file:./config/spring-ai-common.yml"
+
+  # ===========================================================================
+  #  ★ 本模块专属：用本地配置"覆盖"共享配置里的 chat 能力 ★
+  # ---------------------------------------------------------------------------
+  #  为什么要覆盖？
+  #    - 共享配置（config/spring-ai-common.yml）把 chat（对话）能力指向了 DeepSeek。
+  #    - 但 DeepSeek 目前【不支持视觉/图片理解】，无法做多模态。
+  #    - 本模块要"看图说话"，所以必须把 chat 能力切换到真正的 OpenAI 视觉模型。
+  #
+  #  覆盖是怎么生效的？
+  #    - spring.config.import 导入的共享文件优先级较低；
+  #    - 本文件（模块自己的 application.yml）里直接写的属性优先级更高，会覆盖同名属性。
+  #    - 所以下面这段会把 chat 的 base-url / api-key / model 改成 OpenAI 的设置。
+  # ===========================================================================
+  ai:
+    openai:
+      chat:
+        base-url: https://api.openai.com
+        api-key: ${OPENAI_API_KEY:请填OpenAIKey}
+        options:
+          # gpt-4o-mini 是 OpenAI 支持视觉（图文输入）的多模态模型，便宜且够用
+          model: gpt-4o-mini

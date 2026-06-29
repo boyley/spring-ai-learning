@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: 16-observability-testing
+  config:
+    import:
+      - "optional:file:../config/spring-ai-common.yml"
+      - "optional:file:./config/spring-ai-common.yml"
+
+# ============================================================================
+#  ★ Actuator 可观测性配置（management.*）★
+#  Actuator 把应用内部状态通过 /actuator/** 端点暴露出来。
+# ============================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        # 暴露哪些端点（默认只暴露 health）。这里额外暴露 metrics、info。
+        #   health  -> /actuator/health   应用健康状况
+        #   metrics -> /actuator/metrics  各项指标列表（含 Spring AI 的 gen_ai 指标）
+        #   info    -> /actuator/info     应用信息
+        include: health,metrics,info
+  endpoint:
+    health:
+      show-details: always   # health 端点显示详细信息
+
+# 日志配置：聚焦演示输出
+logging:
+  level:
+    root: WARN
+    com.example.springai: INFO
+    org.springframework.ai: INFO

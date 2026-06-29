@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ============================================================================= -->
+    <!-- 这是【父工程 / 聚合工程】的 POM。                                              -->
+    <!-- 作用：                                                                         -->
+    <!--   1. 作为所有子模块的“父亲”，统一管理 Java 版本、依赖版本（一处定义，处处生效）-->
+    <!--   2. 作为“聚合工程”，用 <modules> 把 16 个学习模块聚合在一起，               -->
+    <!--      在根目录执行 mvn 命令时会一次性处理所有模块。                            -->
+    <!--   3. packaging 必须是 pom（它本身不产出 jar，只负责管理和聚合）。            -->
+    <!-- ============================================================================= -->
+
+    <!-- 继承 Spring Boot 官方父工程：它已经帮我们管理好了 Spring、日志、测试等几百个依赖的版本，
+         我们只需要写依赖的 groupId/artifactId，不用写 <version>，避免版本冲突。 -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.4</version>
+        <relativePath/> <!-- 留空表示从 Maven 仓库下载父工程，而不是从本地路径找 -->
+    </parent>
+
+    <!-- 本项目自己的坐标（GAV：GroupId + ArtifactId + Version 唯一标识一个 Maven 项目） -->
+    <groupId>com.example.springai</groupId>
+    <artifactId>spring-ai-learning</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging> <!-- pom 类型 = 这是个父/聚合工程，不打成可运行 jar -->
+
+    <name>Spring AI 零基础学习项目</name>
+    <description>按知识点循序渐进的 Spring AI 学习项目，每个知识点是一个独立可运行的模块</description>
+
+    <!-- 全局属性：在这里集中定义版本号等，下面用 ${...} 引用，改一处即可全局生效 -->
+    <properties>
+        <!-- 源码与编译目标的 Java 版本。Spring Boot 3.5 / Spring AI 1.1 要求 Java 17+ -->
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Spring AI 的版本。这是当前最新稳定 GA 版本（2.0.0 仍是里程碑版，不用）。 -->
+        <spring-ai.version>1.1.7</spring-ai.version>
+    </properties>
+
+    <!-- ============================================================================= -->
+    <!-- 聚合的子模块列表。                                                             -->
+    <!-- 这里的名字 = 子模块所在的【文件夹名】。带 01、02… 前缀是为了标明学习顺序。     -->
+    <!-- ============================================================================= -->
+    <modules>
+        <module>01-overview-quickstart</module>   <!-- AI 核心概念 + 第一个 ChatClient 调用 -->
+        <module>02-chat-client</module>           <!-- ChatClient API：流式/非流式/运行时参数 -->
+        <module>03-prompt</module>                <!-- Prompt 提示词：模板、System/User 角色 -->
+        <module>04-structured-output</module>     <!-- 结构化输出：把回答转成 Java 对象/List/Map -->
+        <module>05-multimodality</module>         <!-- 多模态：图片 + 文字一起输入 -->
+        <module>06-chat-memory</module>           <!-- 对话记忆：让 AI 记住上下文 -->
+        <module>07-advisors</module>              <!-- Advisor 顾问/拦截器机制 -->
+        <module>08-tool-calling</module>          <!-- 工具调用 / 函数调用 -->
+        <module>09-embedding</module>             <!-- 文本向量化 Embedding -->
+        <module>10-vector-store</module>          <!-- 向量数据库（内存版 SimpleVectorStore） -->
+        <module>11-rag-etl</module>               <!-- 检索增强生成 RAG + 文档 ETL 管道 -->
+        <module>12-image-model</module>           <!-- 文生图 -->
+        <module>13-audio-model</module>           <!-- 语音转文字 + 文字转语音 -->
+        <module>14-mcp</module>                   <!-- 模型上下文协议 MCP -->
+        <module>15-model-evaluation</module>      <!-- 模型评估 -->
+        <module>16-observability-testing</module> <!-- 可观测性 + 测试 -->
+    </modules>
+
+    <!-- ============================================================================= -->
+    <!-- 依赖版本管理（只管理版本，不真正引入依赖）。                                   -->
+    <!-- 导入 Spring AI 的 BOM（Bill Of Materials 材料清单），它声明了所有 Spring AI    -->
+    <!-- 相关依赖的统一版本。子模块引用 spring-ai 依赖时就不用再写 <version> 了。       -->
+    <!-- ============================================================================= -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope> <!-- scope=import 是导入 BOM 的固定写法 -->
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- 所有子模块都会用到的公共依赖，放在这里，子模块自动继承，不必各自声明 -->
+    <dependencies>
+        <!-- Lombok：用注解自动生成 getter/setter/构造器等，减少样板代码（可选，方便初学者） -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- 测试起步依赖：JUnit5 等。Spring Boot 项目标配 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!-- pluginManagement：统一管理插件版本，子模块用到时无需再写版本 -->
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <!-- 打包时排除 lombok（它只在编译期需要） -->
+                        <excludes>
+                            <exclude>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

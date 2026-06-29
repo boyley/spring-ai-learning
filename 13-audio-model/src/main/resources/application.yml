@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: 13-audio-model
+  config:
+    import:
+      - "optional:file:../config/spring-ai-common.yml"
+      - "optional:file:./config/spring-ai-common.yml"

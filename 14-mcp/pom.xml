@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 继承父工程：自动获得 Java17、Spring Boot、Spring AI BOM 等所有版本管理 -->
+    <parent>
+        <groupId>com.example.springai</groupId>
+        <artifactId>spring-ai-learning</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!-- 本模块的标识 -->
+    <artifactId>14-mcp</artifactId>
+    <name>14-模型上下文协议 MCP</name>
+    <description>用 Spring AI 构建一个最小可用的 MCP Server，对外暴露工具</description>
+
+    <dependencies>
+        <!-- ★ Spring AI 的 MCP Server Starter（WebMVC / 基于 SSE+HTTP 传输）★
+             作用：
+               1. 自动启动一个 MCP Server，遵循 Model Context Protocol（模型上下文协议）。
+               2. 自动把容器里声明的 ToolCallbackProvider Bean 暴露成「MCP 工具」，
+                  这样任何 MCP 客户端（Claude Desktop、另一个 Spring AI 应用等）都能发现并调用它们。
+               3. webmvc 变体使用 SSE（Server-Sent Events）+ HTTP 作为传输层，
+                  会自动注册一个 /sse 端点供客户端连接（区别于基于标准输入输出的 STDIO 传输）。
+             版本号不用写，父工程的 spring-ai-bom 已统一管理。 -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+        </dependency>
+
+        <!-- WebMVC 变体的 MCP Server 是跑在 Web 容器里的（需要 Tomcat + Spring MVC），
+             所以显式引入 web starter。版本由 Spring Boot 父工程统一管理。 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Spring Boot 打包/运行插件 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

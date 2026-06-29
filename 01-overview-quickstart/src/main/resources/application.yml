@@ -1,0 +1,12 @@
+# 本模块自己的配置文件。
+# 关键点：通过 spring.config.import 导入“项目唯一的共享配置文件”，
+# 这样 API Key、模型等只需在 config/spring-ai-common.yml 配一次，本模块即可生效。
+spring:
+  application:
+    name: 01-overview-quickstart
+  config:
+    # 导入共享配置。optional 表示文件找不到也不报错（容错）。
+    # 提供两个相对路径以兼容“在模块目录运行”和“在项目根目录运行”两种情况：
+    import:
+      - "optional:file:../config/spring-ai-common.yml"   # 在模块目录内运行时（推荐）
+      - "optional:file:./config/spring-ai-common.yml"    # 在项目根目录运行时

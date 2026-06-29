@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 继承父工程：自动获得 Java17、Spring Boot、Spring AI BOM 等所有版本管理 -->
+    <parent>
+        <groupId>com.example.springai</groupId>
+        <artifactId>spring-ai-learning</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!-- 本模块的标识 -->
+    <artifactId>01-overview-quickstart</artifactId>
+    <name>01-概念与快速上手</name>
+    <description>Spring AI 核心概念 + 你的第一个 ChatClient 调用</description>
+
+    <dependencies>
+        <!-- ★ Spring AI 的 OpenAI Starter ★
+             这是本项目最核心的依赖。它会：
+             1. 自动配置好 OpenAiChatModel（底层模型）和 ChatClient.Builder（高级客户端）
+             2. 自动读取 spring.ai.openai.* 配置（我们的共享配置文件里就是这些）
+             因为 DeepSeek 接口兼容 OpenAI，所以用这一个 starter 即可同时支持两家。
+             注意：版本号不用写，父工程的 spring-ai-bom 已统一管理。 -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Spring Boot 打包/运行插件：让 mvn spring-boot:run 可用 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

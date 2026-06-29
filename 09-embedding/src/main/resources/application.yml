@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: 09-embedding
+  config:
+    import:
+      - "optional:file:../config/spring-ai-common.yml"
+      - "optional:file:./config/spring-ai-common.yml"

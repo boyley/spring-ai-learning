@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: 08-tool-calling
+  config:
+    import:
+      - "optional:file:../config/spring-ai-common.yml"
+      - "optional:file:./config/spring-ai-common.yml"

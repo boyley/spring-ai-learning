@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: 07-advisors
+  config:
+    import:
+      - "optional:file:../config/spring-ai-common.yml"
+      - "optional:file:./config/spring-ai-common.yml"
+
+# 把 Spring AI 内置的 advisor 日志级别调到 DEBUG，
+# 这样 SimpleLoggerAdvisor 才会真正把"请求/响应"打印出来（默认 DEBUG 级别不显示）。
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: DEBUG

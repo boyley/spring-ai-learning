@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: 12-image-model
+  config:
+    import:
+      - "optional:file:../config/spring-ai-common.yml"
+      - "optional:file:./config/spring-ai-common.yml"

@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: 15-model-evaluation
+  config:
+    # 导入共享配置（DeepSeek 作为对话模型，同时充当“裁判”模型）。
+    import:
+      - "optional:file:../config/spring-ai-common.yml"
+      - "optional:file:./config/spring-ai-common.yml"
+
+# 日志配置：聚焦演示输出
+logging:
+  level:
+    root: WARN
+    com.example.springai: INFO
+    org.springframework.ai: INFO

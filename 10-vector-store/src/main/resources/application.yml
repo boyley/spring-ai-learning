@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: 10-vector-store
+  config:
+    import:
+      - "optional:file:../config/spring-ai-common.yml"
+      - "optional:file:./config/spring-ai-common.yml"

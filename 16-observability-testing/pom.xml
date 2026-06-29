@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 继承父工程：自动获得 Java17、Spring Boot、Spring AI BOM 等所有版本管理 -->
+    <parent>
+        <groupId>com.example.springai</groupId>
+        <artifactId>spring-ai-learning</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!-- 本模块的标识 -->
+    <artifactId>16-observability-testing</artifactId>
+    <name>16-可观测性与测试</name>
+    <description>观测 AI 调用的指标/耗时/Token + 如何给 AI 应用写测试</description>
+
+    <dependencies>
+        <!-- OpenAI(兼容 DeepSeek) starter：提供 ChatClient.Builder。
+             Spring AI 会自动为 ChatClient 调用产生 Micrometer observation（观测）。 -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
+        </dependency>
+
+        <!-- Actuator：暴露 /actuator/* 端点（health、metrics、info 等），
+             让我们能通过 HTTP 查看应用的健康状况与各项指标（含 gen_ai 相关指标）。
+             版本由 Spring Boot 父工程统一管理。 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

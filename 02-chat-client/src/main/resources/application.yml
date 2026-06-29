@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: 02-chat-client
+  config:
+    import:
+      - "optional:file:../config/spring-ai-common.yml"
+      - "optional:file:./config/spring-ai-common.yml"
