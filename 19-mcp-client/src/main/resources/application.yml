@@ -1,0 +1,40 @@
+spring:
+  # 声明为非 Web 应用：本模块是命令行演示(CommandLineRunner 跑完即退出)。
+  # MCP Client 只是「连出去」消费远端工具，自己不需要对外提供 Web 服务，所以用 none 即可。
+  main:
+    web-application-type: none
+  application:
+    name: 19-mcp-client
+  config:
+    # 导入共享配置（DeepSeek/OpenAI 的 Key、模型等只配一次）。
+    # 两条 fallback 路径兼容“在模块目录内运行”和“在项目根目录运行”两种情况。
+    import:
+      - "optional:file:../config/spring-ai-common.yml"
+      - "optional:file:./config/spring-ai-common.yml"
+
+  # ============================================================================
+  #  ★ MCP Client 配置（prefix: spring.ai.mcp.client）★
+  #  这些属性由 spring-ai-starter-mcp-client 自动读取，用于建立到远端 MCP Server 的连接。
+  # ============================================================================
+  ai:
+    mcp:
+      client:
+        enabled: true            # 是否启用 MCP 客户端（默认 true）
+        name: weather-mcp-client  # 本客户端的名字（握手 initialize 时告知服务器）
+        version: 1.0.0           # 本客户端版本号
+        type: SYNC               # 客户端工作模式：SYNC（同步，简单）或 ASYNC（响应式）
+        # ---- SSE 传输：声明要连接的远端 MCP Server（可配置多个连接，按名字区分）----
+        sse:
+          connections:
+            # 连接名字随意起（这里叫 weather-server）；它对应 14-mcp 那个天气/时间服务器。
+            weather-server:
+              # 远端 MCP Server 的「基础地址」。客户端会自动在其后拼接 SSE 端点（默认 /sse）。
+              # 14-mcp 启动后跑在 8090 端口，SSE 端点就是 http://localhost:8090/sse。
+              url: http://localhost:8090
+
+# 日志配置：聚焦演示输出
+logging:
+  level:
+    root: WARN
+    com.example.springai: INFO
+    org.springframework.ai: INFO

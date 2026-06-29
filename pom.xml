@@ -61,6 +61,10 @@
         <module>14-mcp</module>                   <!-- 模型上下文协议 MCP -->
         <module>15-model-evaluation</module>      <!-- 模型评估 -->
         <module>16-observability-testing</module> <!-- 可观测性 + 测试 -->
+        <module>17-prompt-engineering</module>    <!-- 提示工程模式（角色/少样本/思维链等） -->
+        <module>18-agents</module>                <!-- 构建智能体（链式/路由/并行/编排/评估优化） -->
+        <module>19-mcp-client</module>            <!-- MCP 客户端（连接并调用 14 的 MCP Server） -->
+        <module>20-moderation</module>            <!-- 内容审核（检测违规内容） -->
     </modules>
 
     <!-- ============================================================================= -->
